@@ -1,0 +1,169 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <title>UploadImage</title>
+  <style>
+    #videoElement {
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    #capturedImage {
+      max-width: 100%;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+    }
+
+    #captureButton {
+      margin-top: 10px;
+    }
+
+    #pasteArea {
+      border: 2px dashed #ccc;
+      padding: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand" href="#page-top">
+      <!--                    <img src="assets/img/navbar-logo.svg" alt="..." />-->
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      Menu
+      <i class="fas fa-bars ms-1"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+        <li class="nav-item"><a class="nav-link" th:href="@{#}"><span th:text="${username}"></span></a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/digital/subject-dropdown}">AddImage</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/digital/subject/create}">Create-Folder</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/digital/recognitionPage}">Recognition</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/digital/getVerification}">Verification</a></li>
+        <li class="nav-item" th:if="${username!=null}"><a class="nav-link" th:href="@{/digital/logout}">logout</a></li>
+        <li class="nav-item" th:if="${username==null}"><a class="nav-link" th:href="@{/digital/LoginPage} ">Login</a></li>
+        <li class="nav-item" th:if="${username==null}"><a class="nav-link" th:href="@{/digital/signup}">SignUp</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<form th:action="@{/digital/recognitionverify}" method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+
+    <label for="formFile" class="form-label">Upload Your Photo</label>
+    <input class="form-control" type="file" id="formFile" name="file1">
+
+    <!-- Live Video Feed -->
+    <video id="videoElement" width="640" height="480" autoplay></video>
+    <button type="button" id="captureButton" class="btn btn-primary">Capture Photo</button>
+
+    <!-- Canvas for Capturing the Image -->
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <input type="hidden" name="file" id="capturedFileInput">
+
+<!--    <label for="formFile1" class="form-label">Upload Your Photo1</label>-->
+<!--    <input class="form-control" type="file" id="formFile1" name="file1">-->
+    <div>
+      <label for="formFile2" class="form-label">Upload Your Photo</label>
+      <input class="form-control" type="file" id="formFile2" name="file2">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+  </div>
+</form>
+
+<!-- Optional JavaScript; choose one of the two! -->
+<!-- Option 1: Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script>
+  const video = document.getElementById('videoElement');
+  const captureButton = document.getElementById('captureButton');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const capturedFileInput = document.getElementById('capturedFileInput');
+  const pasteArea = document.getElementById('pasteArea');
+  const fileInput = document.getElementById('formFile');
+
+  // Access webcam
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      video.srcObject = stream;
+    })
+    .catch(err => {
+      console.error("Error accessing webcam: ", err);
+    });
+
+  // Capture image from the video feed
+  captureButton.addEventListener('click', function () {
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Get the image as a data URL
+    const imageDataURL = canvas.toDataURL('image/png');
+
+    // Display the captured image
+    const img = new Image();
+    img.src = imageDataURL;
+    img.id = 'capturedImage';
+    img.alt = 'Captured Image';
+    document.body.appendChild(img);
+
+    // Create a Blob from the data URL
+    const data = atob(imageDataURL.split(',')[1]);
+    const buffer = new ArrayBuffer(data.length);
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < data.length; i++) {
+      view[i] = data.charCodeAt(i);
+    }
+    const file = new File([buffer], "captured-image.png", { type: "image/png" });
+
+    // Set the captured image file into the input for upload
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
+    capturedFileInput.value = imageDataURL;  // Set the base64 string into hidden field for form submission
+  });
+
+  // Paste image handling
+  pasteArea.addEventListener('paste', function (event) {
+    const items = (event.clipboardData || window.clipboardData).items;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf("image") === 0) {
+        const blob = item.getAsFile();
+
+        // Ensure the blob has a valid name and type for upload
+        const file = new File([blob], "pasted-image.png", { type: blob.type });
+
+        // Add the file to the file input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+
+        // Preview the pasted image
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          pasteArea.innerHTML = `<img src="${e.target.result}" alt="Preview" class="img-fluid"/>`;
+        };
+        reader.readAsDataURL(blob);
+
+        break;
+      }
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md">
+    <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-indigo-700 py-6 px-8 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="bg-white p-3 rounded-full shadow-lg">
+                    <i class="fas fa-lock text-indigo-700 text-2xl"></i>
+                </div>
+            </div>
+            <h1 class="text-2xl font-bold text-white">Admin Portal</h1>
+            <p class="text-indigo-200 mt-1">Secure access to dashboard</p>
+        </div>
+
+        <!-- Login Form -->
+        <form  th:action="@{/authenticateTheUser}" method="POST" class="p-8">
+            <div class="mb-6">
+                <label for="email" class="block text-gray-700 text-sm font-medium mb-2">Admin Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email" name="email"
+                           class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-500 input-focus transition duration-200"
+                           placeholder="admin@example.com" required>
+                </div>
+                <p id="emailError" class="hidden text-red-500 text-xs mt-1">Please enter a valid email address</p>
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-key text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" name="password"
+                           class="w-full pl-10 pr-10 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-500 input-focus transition duration-200"
+                           placeholder="••••••••" required>
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <i class="fas fa-eye text-gray-400 hover:text-indigo-500 cursor-pointer"></i>
+                    </button>
+                </div>
+                <p id="passwordError" class="hidden text-red-500 text-xs mt-1">Password must be at least 8 characters</p>
+            </div>
+
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center">
+                    <input id="remember" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                </div>
+                <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                <span id="loginText">Sign In</span>
+                <i id="loginSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-8 py-4 text-center border-t border-gray-200">
+            <p class="text-xs text-gray-500">© 2023 Admin Portal. All rights reserved.</p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-sm w-full p-6 text-center animate-bounce-in">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-green-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-900 mb-2">Login Successful!</h3>
+            <p class="text-gray-600 mb-4">Redirecting to admin dashboard...</p>
+            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                <div id="progressBar" class="bg-green-500 h-1.5 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const togglePassword = document.getElementById('togglePassword');
+        const loginText = document.getElementById('loginText');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const successModal = document.getElementById('successModal');
+        const progressBar = document.getElementById('progressBar');
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+
+        // Form validation
+        emailInput.addEventListener('input', validateEmail);
+        passwordInput.addEventListener('input', validatePassword);
+
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+            if (!isValid && email.length > 0) {
+                emailError.classList.remove('hidden');
+                emailInput.classList.add('border-red-500');
+                emailInput.classList.remove('border-indigo-500');
+            } else {
+                emailError.classList.add('hidden');
+                emailInput.classList.remove('border-red-500');
+                emailInput.classList.add('border-indigo-500');
+            }
+
+            return isValid;
+        }
+
+        function validatePassword() {
+            const password = passwordInput.value.trim();
+            const isValid = password.length >= 8;
+
+            if (!isValid && password.length > 0) {
+                passwordError.classList.remove('hidden');
+                passwordInput.classList.add('border-red-500');
+                passwordInput.classList.remove('border-indigo-500');
+            } else {
+                passwordError.classList.add('hidden');
+                passwordInput.classList.remove('border-red-500');
+                passwordInput.classList.add('border-indigo-500');
+            }
+
+            return isValid;
+        }
+
+        // Form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+
+            if (isEmailValid && isPasswordValid) {
+                // Show loading state
+                loginText.textContent = 'Authenticating...';
+                loginSpinner.classList.remove('hidden');
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Show success modal
+                    loginText.textContent = 'Sign In';
+                    loginSpinner.classList.add('hidden');
+                    successModal.classList.remove('hidden');
+
+                    // Animate progress bar
+                    let width = 0;
+                    const interval = setInterval(() => {
+                        width += 5;
+                        progressBar.style.width = width + '%';
+
+                        if (width >= 100) {
+                            clearInterval(interval);
+                            // Redirect to dashboard (simulated)
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 50);
+                }, 1500);
+            } else {
+                // Add shake animation to form
+                loginForm.classList.add('shake');
+                setTimeout(() => {
+                    loginForm.classList.remove('shake');
+                }, 500);
+
+                // Validate fields again to show errors
+                validateEmail();
+                validatePassword();
+            }
+        });
+    });
+</script>
+</body>
+</html>
