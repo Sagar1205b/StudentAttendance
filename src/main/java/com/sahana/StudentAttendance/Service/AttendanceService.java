@@ -1,28 +1,17 @@
 package com.sahana.StudentAttendance.Service;
 
 import com.sahana.StudentAttendance.Model.Attendance;
-import com.sahana.StudentAttendance.Repository.AttendanceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.sahana.StudentAttendance.Model.SubjectUser;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-@Service
-public class AttendanceService {
-    @Autowired
-    private AttendanceRepository attendanceRepository;
+public interface AttendanceService {
 
-    public void recordAttendance(String studentName,double similarity){
-        if(similarity>0.95){
-            Attendance attendance=new Attendance();
-            attendance.setStudentName(studentName);
-            attendance.setSimilarity(similarity);
-            attendance.setTimestamp(LocalDateTime.now());
+    void recordAttendance(SubjectUser student, double similarity);
+    List<Attendance> findAll();
+    SubjectUser findSubjectUserByUsn(String usn);
+    List<Attendance>findByFilters(String branch,Integer sem,String dateStr);
 
-            attendance.setPresent(true);
+    List<Attendance>findAttendanceByUser(SubjectUser user);
 
-            attendanceRepository.save(attendance);
-        }
-
-    }
 }

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Attendance Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     .gradient-bg {
       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -66,7 +66,7 @@
   </style>
 </head>
 <body class="gradient-bg min-h-screen py-8 px-4">
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto" th:data-totalstudents="${totalStudents}">
   <!-- Header -->
   <div class="text-center mb-8">
     <h1 class="text-3xl font-bold text-white mb-2">Attendance Management System</h1>
@@ -75,31 +75,43 @@
 
   <!-- Filters -->
   <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <form th:action="@{/digital/attendance-filter}" method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <label for="branch" class="block text-sm font-medium text-gray-700 mb-1">Branch</label>
-        <select id="branch" th:field="*{branch}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-          <option value="">All Branches</option>
-          <option th:each="branch : ${branches}" th:value="${branch}" th:text="${branch}"></option>
+        <label for="Branch" class="block text-sm font-medium text-gray-700 mb-1">Branch</label>
+        <select id="Branch" name="branch" class="w-full px-4 py-2 border border-gray-300 rounded-md" required>
+          <option value="">-- Select Branch --</option>
+          <option value="CSE">Computer Science (CSE)</option>
+          <option value="ECE">Electronics (ECE)</option>
+          <option value="ME">Mechanical (ME)</option>
+          <option value="CE">Civil (CE)</option>
+          <option value="EE">Electrical (EE)</option>
+          <option value="IT">IT</option>
         </select>
       </div>
       <div>
         <label for="semester" class="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-        <select id="semester" th:field="*{semester}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-          <option value="">All Semesters</option>
-          <option th:each="sem : ${semesters}" th:value="${sem}" th:text="${sem}"></option>
+        <select id="semester" name="semester" class="w-full px-4 py-2 border border-gray-300 rounded-md" required>
+          <option value="">-- Select Semester --</option>
+          <option value="1">1st Semester</option>
+          <option value="2">2nd Semester</option>
+          <option value="3">3rd Semester</option>
+          <option value="4">4th Semester</option>
+          <option value="5">5th Semester</option>
+          <option value="6">6th Semester</option>
+          <option value="7">7th Semester</option>
+          <option value="8">8th Semester</option>
         </select>
       </div>
       <div>
         <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-        <input type="date" id="date" th:field="*{date}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        <input type="date" id="date" name="date" class="w-full px-4 py-2 border border-gray-300 rounded-md"  required/>
       </div>
-    </div>
-    <div class="mt-4 flex justify-end">
-      <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-        <i class="fas fa-filter mr-2"></i> Filter
-      </button>
-    </div>
+      <div class="col-span-full mt-4 flex justify-end">
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+          <i class="fas fa-filter mr-2"></i> Filter
+        </button>
+      </div>
+    </form>
   </div>
 
   <!-- Attendance Summary -->
@@ -112,15 +124,15 @@
       <div class="flex space-x-4 mt-4 md:mt-0">
         <div class="text-center">
           <p class="text-sm text-gray-600">Present</p>
-          <p id="presentCount" class="text-2xl font-bold text-green-600">0</p>
+          <p id="presentCount" th:text="${presentCount}" class="text-2xl font-bold text-green-600">0</p>
         </div>
         <div class="text-center">
-          <p class="text-sm text-gray-600">Absent</p>
-          <p id="absentCount" class="text-2xl font-bold text-red-600">0</p>
+          <p   class="text-sm text-gray-600">Absent</p>
+          <p  th:text="${absentCount}" id="absentCount" class="text-2xl font-bold text-red-600">0</p>
         </div>
         <div class="text-center">
           <p class="text-sm text-gray-600">Percentage</p>
-          <p id="percentage" class="text-2xl font-bold text-indigo-600">0%</p>
+          <p th:text="${percentage}" id="percentage" class="text-2xl font-bold text-indigo-600">0%</p>
         </div>
       </div>
     </div>
@@ -132,41 +144,36 @@
   <!-- Students List -->
   <div class="bg-white rounded-xl shadow-lg p-6">
     <div class="overflow-x-auto">
+      <p class="text-gray-600">Today's Date: <span th:text="${T(java.time.LocalDate).now()}"></span></p>
+
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
         <tr>
           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">USN</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAME</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SEM</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BRANCH</th>
           <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DATE/TIME</th>
         </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-        <tr th:each="student : ${students}" class="hover:bg-gray-50">
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${student.usn}"></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${student.name}"></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${student.semester}"></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${student.branch}"></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <span th:if="${student.present}" class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Present</span>
-            <span th:unless="${student.present}" class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Absent</span>
+        <tbody class="bg-white divide-y divide-gray-200" th:each="student : ${students}" >
+        <tr class="hover:bg-gray-50">
+          <td th:text="${student.usn}">USN</td>
+          <td th:text="${student.name}">Name</td>
+          <td th:text="${student.semester}">Semester</td>
+          <td th:text="${student.branch}">Branch</td>
+          <td >
+            <span th:if="${student.present}" class="bg-green-100 text-green-800">Present</span>
+            <span th:if="${!student.present}" class="bg-red-100 text-red-800">Absent</span>
           </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <label class="toggle-switch">
-              <input type="checkbox" th:checked="${student.present}" th:value="${student.usn}" class="attendance-toggle">
-              <span class="slider"></span>
-            </label>
-          </td>
+          <td  th:text="${student.timestamp}"></td>
         </tr>
         </tbody>
+
       </table>
     </div>
     <div class="mt-6 flex justify-between items-center">
-      <div>
-        <p class="text-sm text-gray-600">Showing <span th:text="${students.size()}"></span> of <span th:text="${totalStudents}"></span> students</p>
-      </div>
       <div>
         <button id="saveAttendance" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
           <i class="fas fa-save mr-2"></i> Save Attendance
@@ -177,86 +184,45 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const attendanceToggles = document.querySelectorAll('.attendance-toggle');
-    const presentCountElement = document.getElementById('presentCount');
-    const absentCountElement = document.getElementById('absentCount');
-    const percentageElement = document.getElementById('percentage');
-    const attendanceBar = document.getElementById('attendanceBar');
-    const saveButton = document.getElementById('saveAttendance');
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggles = document.querySelectorAll(".attendance-toggle");
+    const presentCountEl = document.getElementById("presentCount");
+    const absentCountEl = document.getElementById("absentCount");
+    const percentageEl = document.getElementById("percentage");
+    const attendanceBar = document.getElementById("attendanceBar");
+    const totalStudents = Number(document.querySelector('[th\\:data-totalstudents]').getAttribute('data-totalstudents')) || 0;
 
-    let totalStudents = parseInt(document.querySelector('[th\\:text="${totalStudents}"]').textContent);
-    let presentCount = 0;
-    let absentCount = totalStudents;
-
-    // Initialize counts based on pre-checked toggles (if any)
-    document.querySelectorAll('.attendance-toggle:checked').forEach(toggle => {
-      presentCount++;
-      absentCount--;
-    });
-
-    updateAttendanceSummary();
-
-    // Add event listeners to all toggle switches
-    attendanceToggles.forEach(toggle => {
-      toggle.addEventListener('change', function() {
-        if (this.checked) {
-          presentCount++;
-          absentCount--;
-        } else {
-          presentCount--;
-          absentCount++;
-        }
-        updateAttendanceSummary();
+    function updateCounts() {
+      let presentCount = 0;
+      toggles.forEach(toggle => {
+        if (toggle.checked) presentCount++;
       });
-    });
+      let absentCount = totalStudents - presentCount;
+      let percent = totalStudents === 0 ? 0 : Math.round((presentCount / totalStudents) * 100);
 
-    function updateAttendanceSummary() {
-      presentCountElement.textContent = presentCount;
-      absentCountElement.textContent = absentCount;
-
-      const percentage = totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 0;
-      percentageElement.textContent = percentage + '%';
-      attendanceBar.style.width = percentage + '%';
+      presentCountEl.textContent = presentCount;
+      absentCountEl.textContent = absentCount;
+      percentageEl.textContent = percent + "%";
+      attendanceBar.style.width = percent + "%";
     }
 
-    // Save attendance
-    saveButton.addEventListener('click', function() {
+    toggles.forEach(toggle => {
+      toggle.addEventListener("change", updateCounts);
+    });
+
+    updateCounts();
+
+    document.getElementById("saveAttendance").addEventListener("click", () => {
       const attendanceData = [];
-      attendanceToggles.forEach(toggle => {
-        attendanceData.push({
-          usn: toggle.value,
-          present: toggle.checked
-        });
+      toggles.forEach(toggle => {
+        attendanceData.push({ USN: toggle.value, present: toggle.checked });
       });
-
-      // Simulate API call
-      saveButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
-      saveButton.disabled = true;
-
-      setTimeout(() => {
-        // Show success message
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center';
-        toast.innerHTML = `
-          <i class="fas fa-check-circle mr-2"></i>
-          <span>Attendance saved successfully!</span>
-        `;
-        document.body.appendChild(toast);
-
-        // Remove toast after 3 seconds
-        setTimeout(() => {
-          toast.remove();
-        }, 3000);
-
-        saveButton.innerHTML = '<i class="fas fa-save mr-2"></i> Save Attendance';
-        saveButton.disabled = false;
-      }, 1500);
-
-      // In a real application, you would send this data to the server
-      console.log('Attendance data to save:', attendanceData);
+      console.log("Attendance Data to save:", attendanceData);
+      // TODO: Implement AJAX call or form submission to send attendanceData to server
+      alert("Attendance saved (simulation). Check console for data.");
     });
   });
 </script>
 </body>
 </html>
+

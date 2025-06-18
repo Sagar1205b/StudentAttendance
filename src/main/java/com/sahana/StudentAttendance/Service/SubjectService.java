@@ -13,6 +13,11 @@ public interface SubjectService {
     SubjectUser createAndSaveSubject(SubjectRequest subject);
     List<String> getAllSubjects();
     List<String> getAllUSNs();
+    List<SubjectUser> findAll();
+    boolean hasUserCompletedRegistration(String username);
+
+
+
 
 
 

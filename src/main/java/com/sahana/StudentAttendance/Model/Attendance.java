@@ -1,10 +1,6 @@
 package com.sahana.StudentAttendance.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +12,22 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String studentName;
+    @Column(name = "usn")
+    private String USN;
     private double similarity;
     private boolean present;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "usn", referencedColumnName = "usn", insertable = false, updatable = false)
+    private SubjectUser subjectUser;
+
+    public SubjectUser getSubjectUser() {
+        return subjectUser;
+    }
+
+    public void setSubjectUser(SubjectUser subjectUser) {
+        this.subjectUser = subjectUser;
+    }
 
     public boolean isPresent() {
         return present;
@@ -38,12 +47,12 @@ public class Attendance {
 
     private LocalDateTime timestamp;
 
-    public String getStudentName() {
-        return studentName;
+    public String getUSN() {
+        return USN;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setUSN(String USN) {
+        this.USN = USN;
     }
 
     public Long getId() {

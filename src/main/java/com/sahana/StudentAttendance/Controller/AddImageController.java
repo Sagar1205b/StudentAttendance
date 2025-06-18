@@ -46,7 +46,9 @@ public class AddImageController {
     public String Uploadimage(@ModelAttribute("imageupload") AddImage addImage,
                               @RequestParam("file") MultipartFile file) {
         try {
+
             addImageService.addImage(addImage.getUSN(), file);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

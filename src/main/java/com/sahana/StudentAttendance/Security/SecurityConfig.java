@@ -52,7 +52,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(configurer ->
                         configurer
-                                .requestMatchers("/digital/signup", "/digital/save", "/digital/home",
+                                .requestMatchers("/digital/signup", "/digital/save", "/digital/index",
                                         "/digital/dashboard", "/digital/verify-otp", "/css/**", "/js/**",
                                         "/assets/**", "/img/**", "/logos/**", "/team/**").permitAll()
                                 .requestMatchers("/digital/dashboard").hasRole("ADMIN")

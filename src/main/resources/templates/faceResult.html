@@ -75,10 +75,10 @@
                 </a>
             </div>
             <div class="hidden md:flex items-center space-x-8">
-                <a th:href="@{/digital/index}" class="nav-link py-2 px-1"><span th:text="${username}">Home</span></a>
-                <a th:href="@{/digital/subject-dropdown}" class="nav-link py-2 px-1">Upload Your image</a>
-                <a th:href="@{/digital/subject/create}" class="nav-link py-2 px-1">Register</a>
-                <a th:href="@{/digital/recognitionPage}" class="nav-link py-2 px-1">Attendance</a>
+                <a th:href="@{/digital/home}" class="nav-link py-2 px-1"><span th:text="${username}">Home</span></a>
+<!--                <a th:href="@{/digital/subject-dropdown}" class="nav-link py-2 px-1">Upload Your image</a>-->
+<!--                <a th:href="@{/digital/subject/create}" class="nav-link py-2 px-1">Register</a>-->
+<!--                <a th:href="@{/digital/recognitionPage}" class="nav-link py-2 px-1">Attendance</a>-->
 
                 <a th:if="${username!=null}" th:href="@{/digital/logout}" class="nav-link py-2 px-1">Logout</a>
                 <a th:if="${username==null}" th:href="@{/digital/LoginPage}" class="nav-link py-2 px-1">Login</a>

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubjectServiceImpl implements SubjectService {
@@ -69,8 +70,8 @@ public class SubjectServiceImpl implements SubjectService {
         user.setSubject(subjectRequest.getSubject());
         user.setLicenseHolder(licenseHolder);
         user.setBranch(subjectRequest.getBranch());
-        user.setSEM(subjectRequest.getSEM());
-        user.setUSN(subjectRequest.getUSN());
+        user.setSem(subjectRequest.getSEM());
+        user.setUsn(subjectRequest.getUSN());
 
          return  subjectRepository.save(user);
     }
@@ -89,6 +90,19 @@ public class SubjectServiceImpl implements SubjectService {
         String username = authentication.getName();
         return subjectRepository.findUSNByUsername(username);
     }
+
+    @Override
+    public List<SubjectUser> findAll() {
+        return subjectRepository.findAll();
+    }
+
+    @Override
+    public boolean hasUserCompletedRegistration(String username) {
+        return subjectRepository.existsByLicenseHolderUsername(username);
+    }
+
+
+
 
 
 }

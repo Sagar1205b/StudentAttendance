@@ -1,7 +1,9 @@
 package com.sahana.StudentAttendance.Controller;
 
 
+import com.sahana.StudentAttendance.Model.Attendance;
 import com.sahana.StudentAttendance.Model.Recgonition.FaceResponse;
+import com.sahana.StudentAttendance.Model.SubjectUser;
 import com.sahana.StudentAttendance.Service.AttendanceService;
 import com.sahana.StudentAttendance.Service.FaceResponseService;
 import com.sahana.StudentAttendance.Util.InstagramImageExtractor;
@@ -70,19 +72,30 @@ public class FaceResponseController {
         }
         return "faceResult";
     }
+
     @PostMapping("/processRecognition")
     public String processRecognition(@ModelAttribute FaceResponse faceResponse, Model model) {
-        // Assume only one result for now
         var result = faceResponse.getResult().get(0);
         var subject = result.getSubjects().get(0);
 
         double similarity = subject.getSimilarity();
-        String studentName = subject.getSubject();
 
-        attendanceService.recordAttendance(studentName, similarity);
+        // Get the subject ID (likely USN) from the response
+        String usn = subject.getSubject(); // or subject.getName(), depending on your model
+
+        // Optional: Add null check
+        if (usn == null || usn.isBlank()) {
+            throw new IllegalArgumentException("USN is null in face recognition result");
+        }
+
+        // Fetch the SubjectUser from the database
+        SubjectUser subjectUser = attendanceService.findSubjectUserByUsn(usn); // You'll need to add this method
+
+        attendanceService.recordAttendance(subjectUser, similarity);
 
         model.addAttribute("faceResponse", faceResponse);
-        return "faceResult"; // the Thymeleaf template
+        return "faceResult";
     }
+
 
 }
