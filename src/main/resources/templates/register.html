@@ -107,6 +107,7 @@
         </div>
 
         <!-- Right Side - Form -->
+
         <div class="md:w-1/2 p-8">
             <div class="text-center mb-8">
                 <h1 class="text-2xl font-bold text-gray-800">Create Your Account</h1>
@@ -115,40 +116,64 @@
 
             <form th:action="@{/digital/save}" th:object="${licenseholder}" method="POST" enctype="multipart/form-data">
                 <!-- Error Messages -->
+                <div th:if="${#fields.hasErrors('*')}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <span th:each="err : ${#fields.errors('*')}" th:text="${err}" class="block"></span>
+                </div>
+
                 <div th:if="${param.error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     <span class="block">Invalid username or password</span>
                 </div>
                 <div th:if="${param.logout}" class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
                     <span class="block">You have been logged out</span>
                 </div>
+                <div th:if="${usernameError}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <span th:text="${usernameError}" class="block"></span>
+                </div>
+                <div th:if="${emailError}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <span th:text="${emailError}" class="block"></span>
+                </div>
 
                 <!-- Username Field -->
                 <div class="mb-4 relative">
-
-                    <input type="text" name="username" id="username"
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="text" name="username" id="username" th:field="*{username}"
                            class="input-field w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Username" required>
+                    <div th:if="${#fields.hasErrors('username')}" class="text-red-500 text-sm mt-1">
+                        <span th:errors="*{username}"></span>
+                    </div>
                 </div>
 
                 <!-- Email Field -->
                 <div class="mb-4 relative">
-
-                    <input type="email" name="email" id="email"
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <input type="email" name="email" id="email" th:field="*{email}"
                            class="input-field w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Email Address" required>
+                    <div th:if="${#fields.hasErrors('email')}" class="text-red-500 text-sm mt-1">
+                        <span th:errors="*{email}"></span>
+                    </div>
                 </div>
 
                 <!-- Password Field -->
                 <div class="mb-4 relative">
-
-                    <input type="password" name="password" id="password"
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" name="password" id="password" th:field="*{password}"
                            class="input-field w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                            placeholder="Password" required>
+                    <div th:if="${#fields.hasErrors('password')}" class="text-red-500 text-sm mt-1">
+                        <span th:errors="*{password}"></span>
+                    </div>
                 </div>
 
                 <!-- Hidden Role Field -->
                 <input type="hidden" name="role" value="ROLE_USER" />
-
 
                 <!-- Terms and Conditions -->
                 <div class="mb-6 flex items-center">

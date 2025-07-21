@@ -6,16 +6,20 @@ import com.sahana.StudentAttendance.Model.AttendanceDTO;
 import com.sahana.StudentAttendance.Model.LicenseHolder;
 import com.sahana.StudentAttendance.Model.SubjectUser;
 import com.sahana.StudentAttendance.Repository.AttendanceRepository;
+import com.sahana.StudentAttendance.Repository.LicenseHolderRepository;
 import com.sahana.StudentAttendance.Service.AttendanceService;
 import com.sahana.StudentAttendance.Service.EmailSenderService;
 import com.sahana.StudentAttendance.Service.LicenseHolderService;
 import com.sahana.StudentAttendance.Service.SubjectService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -23,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -35,15 +40,17 @@ public class AuthController {
     private final LicenseHolderService licenseHolderService;
     private final AttendanceService attendanceService;
     private final AttendanceRepository attendanceRepository;
+    private final LicenseHolderRepository licenseHolderRepository;
 
     @Autowired
     private EmailSenderService emailSenderService;
 
-    public AuthController(SubjectService subjectService, LicenseHolderService licenseHolderService, AttendanceService attendanceService, AttendanceRepository attendanceRepository) {
+    public AuthController(SubjectService subjectService, LicenseHolderService licenseHolderService, AttendanceService attendanceService, AttendanceRepository attendanceRepository, LicenseHolderRepository licenseHolderRepository) {
         this.subjectService = subjectService;
         this.licenseHolderService = licenseHolderService;
         this.attendanceService = attendanceService;
         this.attendanceRepository = attendanceRepository;
+        this.licenseHolderRepository = licenseHolderRepository;
     }
 
 
@@ -119,45 +126,80 @@ public class AuthController {
 
 
 
+//    @PostMapping("/save")
+//    public  String saveLicenseHolder(@ModelAttribute("licenseholder") LicenseHolder thelicenseHolder, BindingResult result,Model model){
+//        /* Random random=new Random();
+//	int otp=100000+random.nextInt(900000);
+//    String name=thelicenseHolder.getUsername();
+//
+//        String email= thelicenseHolder.getEmail();
+//        String subject="DigtialIdentity Email Verification";
+//        String body = "Hi "+name+",\nYour one time password is " + otp + ".\nPlease don't share this with anyone.";
+//        session.setAttribute("otp", otp);
+//        session.setAttribute("tempUser", thelicenseHolder);
+//
+//        emailSenderService.sendEmail(email,subject,body);
+//
+//        licenseHolderService.save(thelicenseHolder);
+//                   */
+//        Optional<LicenseHolder> existingUser=licenseHolderRepository.findByUsername(thelicenseHolder.getUsername());
+//        Optional<LicenseHolder> existingEmail=licenseHolderRepository.findByEmail(thelicenseHolder.getEmail());
+//
+//
+//        licenseHolderService.save(thelicenseHolder);
+//
+//        return  "redirect:/digital/home";
+//    }
     @PostMapping("/save")
-    public  String saveLicenseHolder(@ModelAttribute("licenseholder") LicenseHolder thelicenseHolder, HttpSession session){
-        /* Random random=new Random();
-	int otp=100000+random.nextInt(900000);
-    String name=thelicenseHolder.getUsername();
+    public String saveLicenseHolder(@Valid @ModelAttribute("licenseholder") LicenseHolder licenseHolder,
+                                    BindingResult result,
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) {
 
-        String email= thelicenseHolder.getEmail();
-        String subject="DigtialIdentity Email Verification";
-        String body = "Hi "+name+",\nYour one time password is " + otp + ".\nPlease don't share this with anyone.";
-        session.setAttribute("otp", otp);
-        session.setAttribute("tempUser", thelicenseHolder);
+        // Check if username exists
+        if (licenseHolderRepository.findByUsername(licenseHolder.getUsername()).isPresent()) {
+            model.addAttribute("usernameError", "Username is already taken");
+            return "register";
+        }
 
-        emailSenderService.sendEmail(email,subject,body);
+        // Check if email exists
+        if (licenseHolderRepository.findByEmail(licenseHolder.getEmail()).isPresent()) {
+            model.addAttribute("emailError", "Email is already registered");
+            return "register";
+        }
 
-        licenseHolderService.save(thelicenseHolder);
-                   */
-        licenseHolderService.save(thelicenseHolder);
+        if (result.hasErrors()) {
+            return "register";
+        }
 
-        return  "redirect:/digital/home";
-    }
-
-    @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestParam("otp") int enteredOtp, HttpSession session) {
-        Integer generatedOtp = (Integer) session.getAttribute("otp");
-        LicenseHolder licenseHolder = (LicenseHolder) session.getAttribute("tempUser");
-
-        if (generatedOtp != null && licenseHolder != null && enteredOtp == generatedOtp) {
-            licenseHolderService.save(licenseHolder); // Now save to DB
-
-            // Clean up session
-            session.removeAttribute("otp");
-            session.removeAttribute("tempUser");
-
+        try {
+            licenseHolderService.save(licenseHolder);
+            redirectAttributes.addFlashAttribute("success", "Registration successful!");
             return "redirect:/digital/home";
-        } else {
-            // Add error message if needed
-            return "verify-otp";
+        } catch (Exception e) {
+            model.addAttribute("error", "Registration failed: " + e.getMessage());
+            return "register";
         }
     }
+
+//    @PostMapping("/verify-otp")
+//    public String verifyOtp(@RequestParam("otp") int enteredOtp, HttpSession session) {
+//        Integer generatedOtp = (Integer) session.getAttribute("otp");
+//        LicenseHolder licenseHolder = (LicenseHolder) session.getAttribute("tempUser");
+//
+//        if (generatedOtp != null && licenseHolder != null && enteredOtp == generatedOtp) {
+//            licenseHolderService.save(licenseHolder); // Now save to DB
+//
+//            // Clean up session
+//            session.removeAttribute("otp");
+//            session.removeAttribute("tempUser");
+//
+//            return "redirect:/digital/home";
+//        } else {
+//            // Add error message if needed
+//            return "verify-otp";
+//        }
+//    }
 
 
 
@@ -194,12 +236,7 @@ public class AuthController {
                     }
 
                     boolean dateMatches = true;
-//                    if (dateStr != null && !dateStr.isBlank()) {
-//                        // Only keep users who have attendance on this date
-//                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//                        dateMatches = attendanceService.findAttendanceByUser(user).stream()
-//                                .anyMatch(att -> att.getTimestamp().toLocalDate().format(formatter).equals(dateStr));
-//                    }
+
 
                     return branchMatches && semMatches && dateMatches;
                 })
