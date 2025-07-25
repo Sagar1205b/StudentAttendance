@@ -57,9 +57,11 @@ public class AuthController {
 
 
     @GetMapping("/signup")
-    public String getSignup(){
+    public String getSignup(Model model) {
+        model.addAttribute("licenseholder", new LicenseHolder());
         return "register";
     }
+
 
     @GetMapping("/verify-otp")
     public String getOtpVerificationPage() {

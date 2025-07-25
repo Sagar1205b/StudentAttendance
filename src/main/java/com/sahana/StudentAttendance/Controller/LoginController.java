@@ -13,12 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/digital")
 public class LoginController {
 
-
-
     @GetMapping("/LoginPage")
     public String  showMyLoginPage(){
-
-
         return "login";
     }
 
