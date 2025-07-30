@@ -56,16 +56,5 @@ public class AddImageController {
     }
 
 
-//    @PostMapping("/faces")
-//    public ResponseEntity<AddImage> recognizeFace(
-//            @RequestParam("subject") String subject,
-////            @RequestParam("det_prob_threshold") String threshold,
-//            @RequestParam("file") MultipartFile file){
-//        try {
-//            AddImage response=addImageService.addImage(subject,file);
-//            return ResponseEntity.ok(response);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+
 }

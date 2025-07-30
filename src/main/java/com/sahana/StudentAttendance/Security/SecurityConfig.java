@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(configurer ->
                         configurer
 
-                                .requestMatchers("/digital/signup", "/digital/save", "/digital/index",
+                                .requestMatchers("/digital/signup", "/digital/save", "/digital/index","/digital/recognitionPage","/digital/forgot-password","/digital/reset-password",
                                         "/digital/verify-otp", "/css/**", "/js/**",
                                         "/assets/**", "/img/**", "/logos/**", "/team/**").permitAll()
                                 .requestMatchers("/digital/dashboard").hasRole("ADMIN")

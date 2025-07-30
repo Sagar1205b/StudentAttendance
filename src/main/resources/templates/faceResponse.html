@@ -75,15 +75,6 @@
       </div>
       <div class="hidden md:block">
         <div class="ml-10 flex items-baseline space-x-4">
-          <a th:href="@{/digital/home}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Home</a>
-<!--          <a th:href="@{/digital/subject-dropdown}" class="px-3 py-2 rounded-md text-sm font-medium bg-white text-indigo-700">Add Image</a>-->
-<!--          <a th:href="@{/digital/subject/create}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Create Folder</a>-->
-<!--          <a th:href="@{/digital/recognitionPage}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Recognition</a>-->
-<!--          <a th:href="@{/digital/getVerification}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Verification</a>-->
-          <span th:if="${username!=null}">
-                            <a th:href="@{/digital/logout}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Logout</a>
-                        </span>
-          <span th:if="${username==null}">
                             <a th:href="@{/digital/LoginPage}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Login</a>
                             <a th:href="@{/digital/signup}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 hover:text-white">Sign Up</a>
                         </span>
@@ -101,17 +92,6 @@
   <div class="hidden md:hidden" id="mobile-menu">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
       <a th:href="@{/digital/home}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 hover:text-white">Home</a>
-      <a th:href="@{/digital/subject-dropdown}" class="block px-3 py-2 rounded-md text-base font-medium bg-white text-indigo-700">UploadYourImage</a>
-      <a th:href="@{/digital/subject/create}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 hover:text-white">Register</a>
-      <a th:href="@{/digital/recognitionPage}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 hover:text-white">Attendance</a>
-
-      <span th:if="${username!=null}">
-                    <a th:href="@{/digital/logout}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 hover:text-white">Logout</a>
-                </span>
-      <span th:if="${username==null}">
-                    <a th:href="@{/digital/LoginPage}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 hover:text-white">Login</a>
-                    <a th:href="@{/digital/signup}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 hover:text-white">Sign Up</a>
-                </span>
     </div>
   </div>
 </nav>
@@ -121,32 +101,12 @@
   <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
       <div class="gradient-bg px-6 py-4">
-        <h2 class="text-2xl font-bold text-white">Upload Your Image</h2>
-        <p class="text-indigo-100">Choose from file or capture with your camera</p>
+        <h2 class="text-2xl font-bold text-white">Mark Your Attendance</h2>
+        <p class="text-indigo-100">Capture with your camera</p>
       </div>
 
       <div class="p-6 sm:p-8">
         <form th:action="@{/digital/recognition}" method="post" enctype="multipart/form-data" class="space-y-6">
-          <!-- File Upload Option -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Upload from device</label>
-            <div class="upload-area p-6 text-center cursor-pointer" onclick="document.getElementById('formFile').click()">
-              <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
-              <p class="text-gray-500">Click to browse or drag & drop your image</p>
-              <p class="text-xs text-gray-400 mt-2">Supports JPG, PNG (Max 5MB)</p>
-              <input class="hidden" type="file" id="formFile" name="file" accept="image/*" onchange="previewFile(this)">
-            </div>
-          </div>
-
-          <!-- Or Divider -->
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-300"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-white text-gray-500"> OR </span>
-            </div>
-          </div>
 
           <!-- Camera Capture Option -->
           <div>

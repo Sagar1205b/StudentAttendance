@@ -49,8 +49,12 @@
       <div class="wave-bg"></div>
       <div class="relative z-10 text-center">
         <img src="https://cdn-icons-png.flaticon.com/512/3209/3209260.png" alt="Attendance Illustration" class="w-64 mx-auto mb-6">
-        <h2 class="text-3xl font-bold text-indigo-800 mb-2">Smart Attendance System</h2>
-        <p class="text-indigo-600">Facial recognition powered attendance tracking for educational institutions</p>
+
+        <a th:href="@{/digital/recognitionPage}"
+           class="w-full bg-white text-indigo-700 hover:bg-indigo-100 transition-all duration-300 font-bold py-4 px-6 rounded-lg shadow-lg flex items-center justify-center text-center">
+          <i class="fas fa-user-check mr-3 text-xl"></i>
+          <span class="text-lg">Already Registered?<br>Mark Your Attendance Here</span>
+        </a>
       </div>
     </div>
 
@@ -95,7 +99,7 @@
             <label for="remember" class="ml-2 block text-sm text-gray-600">Remember me</label>
           </div>
           <div>
-            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+            <a th:href="@{/digital/forgot-password}" class="text-sm text-indigo-600 hover:text-indigo-500">Forgot password?</a>
           </div>
         </div>
 

@@ -1,12 +1,10 @@
 package com.sahana.StudentAttendance.Controller;
 
 
-import com.sahana.StudentAttendance.Model.Attendance;
-import com.sahana.StudentAttendance.Model.AttendanceDTO;
-import com.sahana.StudentAttendance.Model.LicenseHolder;
-import com.sahana.StudentAttendance.Model.SubjectUser;
+import com.sahana.StudentAttendance.Model.*;
 import com.sahana.StudentAttendance.Repository.AttendanceRepository;
 import com.sahana.StudentAttendance.Repository.LicenseHolderRepository;
+import com.sahana.StudentAttendance.Repository.SubjectRepository;
 import com.sahana.StudentAttendance.Service.AttendanceService;
 import com.sahana.StudentAttendance.Service.EmailSenderService;
 import com.sahana.StudentAttendance.Service.LicenseHolderService;
@@ -15,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,8 +41,10 @@ public class AuthController {
     private final AttendanceRepository attendanceRepository;
     private final LicenseHolderRepository licenseHolderRepository;
 
+
     @Autowired
     private EmailSenderService emailSenderService;
+    private final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
 
     public AuthController(SubjectService subjectService, LicenseHolderService licenseHolderService, AttendanceService attendanceService, AttendanceRepository attendanceRepository, LicenseHolderRepository licenseHolderRepository) {
         this.subjectService = subjectService;
@@ -51,6 +52,7 @@ public class AuthController {
         this.attendanceService = attendanceService;
         this.attendanceRepository = attendanceRepository;
         this.licenseHolderRepository = licenseHolderRepository;
+
     }
 
 
@@ -124,34 +126,39 @@ public class AuthController {
         return "attendance";
     }
 
+    @GetMapping("/forgot-password")
+    public String ForgotMyPassword(Model model){
+        model.addAttribute("resetPasswordRequest",new ResetPasswordRequest());
+        return "reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String handleResetPassword(@ModelAttribute ResetPasswordRequest request,Model model) {
+        if(!request.getNewPassword().equals(request.getConfirmPassword())){
+            model.addAttribute("error","Password do not match");
+            return "reset-password";
+        }
+        Optional<LicenseHolder> userOpt = licenseHolderRepository.findByUsername(request.getIdentifier());
+
+        if (userOpt.isEmpty()) {
+            userOpt = licenseHolderRepository.findByEmail(request.getIdentifier());
+        }
+
+        if (userOpt.isPresent()) {
+          LicenseHolder   user = userOpt.get();
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            licenseHolderRepository.save(user);
+            model.addAttribute("success", "Password updated successfully!");
+        } else {
+            model.addAttribute("error", "User not found.");
+        }
+        return "reset-password";
+
+
+    }
 
 
 
-
-//    @PostMapping("/save")
-//    public  String saveLicenseHolder(@ModelAttribute("licenseholder") LicenseHolder thelicenseHolder, BindingResult result,Model model){
-//        /* Random random=new Random();
-//	int otp=100000+random.nextInt(900000);
-//    String name=thelicenseHolder.getUsername();
-//
-//        String email= thelicenseHolder.getEmail();
-//        String subject="DigtialIdentity Email Verification";
-//        String body = "Hi "+name+",\nYour one time password is " + otp + ".\nPlease don't share this with anyone.";
-//        session.setAttribute("otp", otp);
-//        session.setAttribute("tempUser", thelicenseHolder);
-//
-//        emailSenderService.sendEmail(email,subject,body);
-//
-//        licenseHolderService.save(thelicenseHolder);
-//                   */
-//        Optional<LicenseHolder> existingUser=licenseHolderRepository.findByUsername(thelicenseHolder.getUsername());
-//        Optional<LicenseHolder> existingEmail=licenseHolderRepository.findByEmail(thelicenseHolder.getEmail());
-//
-//
-//        licenseHolderService.save(thelicenseHolder);
-//
-//        return  "redirect:/digital/home";
-//    }
     @PostMapping("/save")
     public String saveLicenseHolder(@Valid @ModelAttribute("licenseholder") LicenseHolder licenseHolder,
                                     BindingResult result,
