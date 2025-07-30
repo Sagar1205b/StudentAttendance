@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(configurer ->
                         configurer
 
-                                .requestMatchers("/digital/signup", "/digital/save", "/digital/index","/digital/recognitionPage","/digital/forgot-password","/digital/reset-password",
+                                .requestMatchers("/digital/signup", "/digital/save", "/digital/index","/digital/recognitionPage","/digital/recognition","/digital/forgot-password","/digital/reset-password","/digital/processRecognition","/digital/faces","/digital/recognitionUrl",
                                         "/digital/verify-otp", "/css/**", "/js/**",
                                         "/assets/**", "/img/**", "/logos/**", "/team/**").permitAll()
                                 .requestMatchers("/digital/dashboard").hasRole("ADMIN")
