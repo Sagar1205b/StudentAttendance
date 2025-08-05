@@ -175,9 +175,10 @@
     </div>
     <div class="mt-6 flex justify-between items-center">
       <div>
-        <button id="saveAttendance" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-          <i class="fas fa-save mr-2"></i> Save Attendance
+        <button id="downloadCSV" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+          <i class="fas fa-download mr-2"></i> Download CSV
         </button>
+
       </div>
     </div>
   </div>
@@ -222,6 +223,37 @@
       alert("Attendance saved (simulation). Check console for data.");
     });
   });
+
+
+  document.getElementById("downloadCSV").addEventListener("click", () => {
+    const table = document.querySelector("table");
+    const rows = table.querySelectorAll("tr");
+    let csv = [];
+
+    rows.forEach(row => {
+      let cols = row.querySelectorAll("th, td");
+      let rowData = [];
+      cols.forEach(col => {
+        // Escape quotes
+        let data = col.innerText.replace(/"/g, '""');
+        rowData.push(`"${data}"`);
+      });
+      csv.push(rowData.join(","));
+    });
+
+    const csvContent = csv.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "attendance.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+
 </script>
 </body>
 </html>
