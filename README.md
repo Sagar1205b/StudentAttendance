@@ -1,4 +1,4 @@
-
+Reach me out ,ready to help with issues
 # 🎓 Student Attendance System using Face Recognition (Java + CompreFace)
 
 This project is a **Student Attendance Management System** built with **Java (Spring Boot)** and integrates with **CompreFace**, an open-source face recognition service. It captures student faces, verifies them via CompreFace, and records attendance in a **PostgreSQL** database.
