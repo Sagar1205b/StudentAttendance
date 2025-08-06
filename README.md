@@ -73,12 +73,7 @@ If using Maven:
 
  
 
-
-  
-
-## 📝 To Do
-- [ ] Improve face matching thresholds  
-- [ ] Add CSV export for attendance    
+   
 
 ## 🤝 Contribution
 Contributions are welcome!  
