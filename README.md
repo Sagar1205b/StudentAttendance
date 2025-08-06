@@ -86,8 +86,6 @@ If you find this project helpful, please ⭐ this repo — it helps it reach mor
 **Sagar B.**  
 GitHub: https://github.com/Sagar1205b
 
-## 📄 License
-This project is licensed under the MIT License.
 
 <img width="1884" height="850" alt="image" src="https://github.com/user-attachments/assets/4dd6c507-979c-4685-a36c-386ec87af81c" />
 <img width="1885" height="841" alt="image" src="https://github.com/user-attachments/assets/a9d6ce66-0ded-4d81-899b-a8542f4b1648" />
